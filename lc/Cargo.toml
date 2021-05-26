@@ -1,0 +1,13 @@
+[package]
+name = "lc"
+description = "lightning command-line interpreter"
+version = "0.1.0"
+authors = ["hvlck <just.ethan@protonmail.com>"]
+edition = "2018"
+readme = "README.md"
+homepage = "https://github.com/hvlck/lightning"
+repository = "https://github.com/hvlck/lightning"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]

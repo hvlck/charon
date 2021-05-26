@@ -1,0 +1,26 @@
+[package]
+name = "lightning"
+description = "core lightning language utilities"
+version = "0.0.1"
+authors = ["hvlck <just.ethan@protonmail.com>"]
+edition = "2018"
+readme = "README.md"
+homepage = "https://github.com/hvlck/lightning"
+repository = "https://github.com/hvlck/lightning"
+license = "Apache-2.0"
+publish = false
+
+[workspace]
+members = [
+    "src/lex",
+    "src/optimise",
+    "src/parse",
+    "src/rt",
+    "src/vm"
+]
+exclude = [
+    "lc/",
+    "wasm/"
+]
+
+[dependencies]
