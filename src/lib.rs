@@ -1,3 +1,6 @@
+// pub mod errors;
+// use errors::Error;
+
 #[cfg(test)]
 mod tests {
     #[test]

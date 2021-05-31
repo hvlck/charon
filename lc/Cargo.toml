@@ -11,3 +11,6 @@ license = "Apache-2.0"
 publish = false
 
 [dependencies]
+structopt = "~0.3.21"
+colored = "~2.0.0"
+lightning = { path = "../" }
