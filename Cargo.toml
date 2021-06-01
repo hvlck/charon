@@ -13,6 +13,7 @@ publish = false
 [workspace]
 members = [
     "src/lex",
+    "src/errors",
     "src/optimise",
     "src/parse",
     "src/rt",
