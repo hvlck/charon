@@ -1,12 +1,20 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Token<'a> {
+    /// the type of token
     pub token_type: TokenType,
-    pub lexeme: String,
-    pub line: usize,
-    pub literal: &'a str,
+    /// token placement
+    pub span: (usize, usize),
+    /// token source
+    pub source: &'a str,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
+pub struct Position {
+    line: usize,
+    col: usize,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // single characters
     LParen,
@@ -15,25 +23,32 @@ pub enum TokenType {
     RBrace,
     Comma,
     Period,
-    Minus,
     Plus,
-    Semicolon,
+    Minus,
+    Asterisk,
     Slash,
+    Semicolon,
 
     // 1-3 characters
     NotEqual,
     NotStrictEqual,
+    ComparisonEqual,
+    // assignment equals
     Equal,
     StrictEqual,
     Greater,
     GreaterThanEqualTo,
     Less,
     LessThanEqualTo,
+    // `!x`
+    Not,
 
     // literals
-    String,
+    String(String),
     Name,
-    Number,
+    Number(f64),
+
+    Identifier(String),
 
     // keywords
     And,
@@ -45,7 +60,19 @@ pub enum TokenType {
     Struct,
     Let,
     Const,
+    True,
+    False,
+    Fn,
+    Return,
 
     // end of input
     EOI,
+
+    // ignored lexemes
+    Comment,
+    DocComment(String),
+    Whitespace,
+
+    // errors
+    Unknown,
 }
