@@ -1,7 +1,7 @@
 use structopt::{clap::AppSettings, StructOpt};
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "lc", about = "lightning compiler", setting = AppSettings::InferSubcommands)]
+#[structopt(name = "chrn", about = "charon compiler", setting = AppSettings::InferSubcommands)]
 enum Opt {
     Build,
     Run,

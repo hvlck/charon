@@ -1,10 +1,10 @@
-# lightning
+# charon
 
 `a small, quick programming language`
 
 ## Notes
 
-Note that the modular design of lightning (the core language is separated from the main interpreter) is to allow it to be ported easily (e.g. to WebAssembly).
+Note that the modular design of charon (the core language is separated from the main interpreter) is to allow it to be ported easily (e.g. to WebAssembly).
 
 + [Features](#features)
 + [FAQs](#faqs)
