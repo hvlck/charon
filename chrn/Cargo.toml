@@ -1,6 +1,6 @@
 [package]
 name = "chrn"
-description = "charon command-line tool"
+description = "charon interpreter"
 version = "0.1.0"
 authors = ["hvlck <just.ethan@protonmail.com>"]
 edition = "2018"
@@ -11,6 +11,6 @@ license = "Apache-2.0"
 publish = false
 
 [dependencies]
-structopt = "~0.3.21"
-colored = "~2.0.0"
+clap = "~2.33.3"
+rustyline = "~8.2.0"
 charon = { path = "../" }

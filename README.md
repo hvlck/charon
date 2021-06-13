@@ -26,8 +26,7 @@ Note that the modular design of charon (the core language is separated from the 
 ## FAQs
 
 <details>
-<summary>Question</summary>
-Answer
+  <summary></summary>
 </details>
 
 ## Roadmap
@@ -35,8 +34,6 @@ Answer
 ## Feedback
 
 ## Documentation
-
-Links to docs.
 
 ### Installation
 
