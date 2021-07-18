@@ -276,7 +276,7 @@ pub fn tokenise(src: &str) -> Result<Vec<Token>, LexError> {
                                     match c {
                                         '=' => {
                                             lexer.next_nth(2);
-                                            TokenType::StrictEqual
+                                            TokenType::StrictComparisonEqual
                                         }
                                         _ => {
                                             lexer.next();

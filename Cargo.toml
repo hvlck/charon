@@ -20,7 +20,7 @@ members = [
     "src/vm"
 ]
 exclude = [
-    "lc/",
+    "chrn/",
     "wasm/"
 ]
 
