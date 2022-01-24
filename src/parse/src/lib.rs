@@ -32,6 +32,12 @@ impl<'a> Parser<'a> {
         self.peek_previous()
     }
 
+    fn advance(&mut self, by: usize) -> () {
+        if let Ok(is_ended) = self.is_ended() {
+            self.index += by;
+        }
+    }
+
     /// Looks at the next token without advancing the parser
     fn peek(&self) -> Option<&Token> {
         self.tokens.get(self.index)
@@ -42,10 +48,16 @@ impl<'a> Parser<'a> {
         self.tokens.get(self.index + idx)
     }
 
+    // returns the rest of the tokens in the present statement without advancing the parser
     fn peek_end_of_statement(&self) -> Vec<Token> {
-        let mut idx = 0;
-        while self.peek().unwrap().token_type != TokenType::Semicolon {
-            idx += 1;
+        let mut idx = self.index;
+        while idx < self.tokens.len() {
+            let token_type = self.peek().unwrap().token_type.clone();
+            if token_type != TokenType::Semicolon || token_type != TokenType::EOI {
+                idx += 1;
+            } else {
+                break;
+            }
         }
 
         self.tokens[self.index..idx].to_vec()
@@ -61,11 +73,11 @@ impl<'a> Parser<'a> {
     }
 
     /// returns Ok(true) if there's nothing left to parse (EOI), Ok(false) if there is, and Err(ParseError) if something went wrong peeking the next token
-    fn is_ended(&self) -> Result<(), ParseError> {
+    fn is_ended(&self) -> Result<Node, ParseError> {
         if self.index >= self.tokens.len() {
             Err(ParseError::UnexpectedTermination)
         } else {
-            Ok(())
+            Ok(Node::EOI)
         }
     }
 
@@ -88,6 +100,7 @@ impl<'a> Parser<'a> {
         None
     }
 
+    // returns the index of the next right paranthesis
     fn next_rparan_idx(&self) -> Option<usize> {
         for (idx, i) in self.tokens.clone().into_iter().enumerate() {
             if i.token_type == TokenType::RParen {
@@ -106,6 +119,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    // converts a standard token to an operator
     fn tok_to_op(tok: Token) -> Option<Op> {
         match tok.token_type {
             TokenType::Plus => Some(Op::Add),
@@ -166,6 +180,7 @@ impl<'a> Parser<'a> {
     }
 
     fn expr(&mut self) -> Result<Node, ParseError> {
+        println!("{}", self.index);
         self.is_ended()?;
 
         let token = self.tokens[self.index].clone();
@@ -176,15 +191,18 @@ impl<'a> Parser<'a> {
             TokenType::LBrace => {}
             TokenType::Comma => {}
             TokenType::Period => {}
-            TokenType::Plus => {}
-            TokenType::Minus => {}
-            TokenType::Asterisk => {}
-            TokenType::Slash => {}
+            TokenType::Plus | TokenType::Minus | TokenType::Asterisk | TokenType::Slash => {
+                let node = Parser::expr_op(self.tokens.clone());
+                match node {
+                    Ok(ast_node) => return Ok(ast_node),
+                    Err(error) => return Err(error),
+                }
+            }
             TokenType::Semicolon => {}
             TokenType::NotEqual => {}
             TokenType::NotStrictEqual => {}
             TokenType::ComparisonEqual => {}
-            TokenType::Equal => {}
+            TokenType::Equal => return Ok(Node::Identifier(String::from("equal is the problem"))),
             TokenType::StrictComparisonEqual => {}
             TokenType::Greater
             | TokenType::GreaterThanEqualTo
@@ -198,7 +216,13 @@ impl<'a> Parser<'a> {
             TokenType::String(s) => return Ok(Node::String(s)),
             TokenType::Name => {}
             TokenType::Number(n) => return Ok(Node::Number(n)),
-            TokenType::Identifier(_) => {}
+            TokenType::Identifier(_) => {
+                // problem: since this returns nothing the test will fail
+                // but does not need to be parsed in `let` declaration
+                // so find a way to make the parser advance past the # of tokens in a let declaration
+                // in the part of this method that handles let declarations
+                return Ok(Node::Identifier(String::from("equal is the problem")));
+            }
             TokenType::And => {}
             TokenType::AndAmpersand => {}
             TokenType::Or => {}
@@ -208,21 +232,25 @@ impl<'a> Parser<'a> {
             TokenType::Struct => {}
             TokenType::Let => {
                 let declaration = self.peek_end_of_statement();
-                let identifier = declaration.get(0).unwrap().source;
-                let value = declaration[2..].to_vec();
+                let identifier = declaration.get(0).unwrap().to_owned();
 
-                return Ok(Node::Variable {
-                    variable_type: Var::Let,
-                    identifier: Box::new(Node::Identifier(identifier.to_string())),
-                    value: Box::new(self.op().unwrap()),
-                });
+                match identifier.token_type {
+                    TokenType::Identifier(ident) => {
+                        return Ok(Node::Variable {
+                            variable_type: Var::Let,
+                            identifier: Box::new(Node::Identifier(ident)),
+                            value: Box::new(Parser::expr_op(declaration[1..].to_vec()).unwrap()),
+                        });
+                    }
+                    _ => return Err(ParseError::InvalidIdentifier),
+                }
             }
             TokenType::Const => {}
             TokenType::True => return Ok(Node::Boolean(true)),
             TokenType::False => return Ok(Node::Boolean(false)),
             TokenType::Fn => {}
             TokenType::Return => {}
-            TokenType::EOI => {}
+            TokenType::EOI => return Ok(Node::EOI),
             _ => return Err(ParseError::UnexpectedToken),
         }
 
@@ -235,10 +263,7 @@ pub fn parse(tokens: Vec<Token>) -> Result<Vec<Node>, ParseError> {
         .to_owned()
         .into_iter()
         .filter(|x| match x.token_type {
-            TokenType::Comment
-            | TokenType::DocComment(_)
-            | TokenType::Whitespace
-            | TokenType::Whitespace => false,
+            TokenType::Comment | TokenType::DocComment(_) | TokenType::Whitespace => false,
             _ => true,
         })
         .collect();
@@ -255,7 +280,32 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_plus_generates_proper_ast() {
+        let ast = parse(tokenise("2+2").unwrap()).unwrap();
+        assert_eq!(ast.len(), 4);
+    }
+
+    #[test]
+    fn test_minus_generates_proper_ast() {
+        let ast = parse(tokenise("2-2").unwrap()).unwrap();
+        assert_eq!(ast.len(), 4);
+    }
+
+    #[test]
+    fn test_multiply_generates_proper_ast() {
+        let ast = parse(tokenise("2*2").unwrap()).unwrap();
+        assert_eq!(ast.len(), 4);
+    }
+
+    #[test]
+    fn test_divide_generates_proper_ast() {
+        let ast = parse(tokenise("2/2").unwrap()).unwrap();
+        assert_eq!(ast.len(), 4);
+    }
+
+    #[test]
     fn let_binding_generates_proper_ast() {
         let ast = parse(tokenise("let t = 2+2").unwrap()).unwrap();
+        println!("{:#?}", ast)
     }
 }

@@ -18,10 +18,14 @@ pub enum Var {
 #[derive(Debug, Clone)]
 pub enum Node {
     Variable {
+        // let or const
         variable_type: Var,
+        // name of the variable
         identifier: Box<Node>,
+        // value of the variable
         value: Box<Node>,
     },
+    // e.g. 2+2
     BinaryExpr {
         operation: Op,
         lhs: Box<Node>,
@@ -44,4 +48,5 @@ pub enum Node {
     String(String),
     Boolean(bool),
     Identifier(String),
+    EOI,
 }

@@ -4,4 +4,5 @@ pub enum ParseError {
     NoToken,
     InvalidType,
     UnexpectedToken,
+    InvalidIdentifier,
 }
