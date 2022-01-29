@@ -1,0 +1,13 @@
+const one = 1
+
+const twelve = test + 11
+
+const t = true
+
+fn test(...addends []number) > numbers {
+
+}
+
+// this is a comment
+
+/// doc comment
