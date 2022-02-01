@@ -22,4 +22,11 @@ func main() {
 	for i, t := range p.ast {
 		log.Printf("node #%v :: '%s' of node type %v on ln %v:%v", i, t.body, t.node_type, t.span.line, t.span.column)
 	}
+
+	c := NewChunk()
+	c.Write(OP_RETURN)
+	c.Write(OP_RETURN)
+	c.Write(OP_RETURN)
+	c.Write(OP_RETURN)
+	c.Disassemble("chunk")
 }
