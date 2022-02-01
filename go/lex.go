@@ -26,6 +26,8 @@ const (
 	STRING
 	IDENTIFIER
 	WHITESPACE
+	LNBREAK
+	SEMI
 
 	CONST
 	LET
@@ -77,6 +79,8 @@ var tokens = []string{
 	STRING:     "STRING",
 	IDENTIFIER: "IDENTIFIER",
 	WHITESPACE: "WHITESPACE",
+	LNBREAK:    "LNBREAK",
+	SEMI:       "SEMI",
 
 	CONST: "CONST",
 	LET:   "LET",
@@ -166,6 +170,8 @@ func (l *Lexer) Lex(rn rune) (Span, Token, string) {
 		return l.span, LPARAN, "("
 	case ')':
 		return l.span, RPARAN, ")"
+	case ';':
+		return l.span, SEMI, ";"
 	case '.':
 		{
 			next := l.nextIsSame(2, '.')
@@ -178,9 +184,8 @@ func (l *Lexer) Lex(rn rune) (Span, Token, string) {
 	default:
 		if unicode.IsSpace(rn) {
 			switch rn {
-			// case '\n' | '\r' | '\t':
-			// 	l.advanceLine()
-			// 	return l.span, WHITESPACE, ""
+			case '\n' | '\r' | '\t':
+				return l.span, LNBREAK, ""
 			case ' ':
 				return l.span, WHITESPACE, ""
 			}
